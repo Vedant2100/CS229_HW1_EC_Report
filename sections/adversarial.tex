@@ -1,0 +1,42 @@
+
+\section*{Extra Credit 3: Adversarial Alien Obfuscation}
+
+\subsection*{Methodology}
+To test the robustness of the language model against varying degrees of linguistic obfuscation, we replaced the original alien operator names (\texttt{flarn}, \texttt{glorp}, etc.) with four alternative mapping schemes:
+\begin{itemize}
+    \item \textbf{Semantic}: Real English words that loosely hint at the mathematical operation (e.g., \texttt{combine} for addition, \texttt{shrink} for subtraction).
+    \item \textbf{Misleading}: Real English words that suggest completely unrelated or incorrect concepts (e.g., \texttt{paint}, \texttt{dance}).
+    \item \textbf{Gibberish}: Random, non-semantic character strings (e.g., \texttt{qahft}, \texttt{bsdmr}).
+    \item \textbf{Unicode}: Non-ASCII mathematical or arbitrary symbols (e.g., $\Delta$, $\oplus$).
+\end{itemize}
+These prompts were evaluated zero-shot with system instructions defining the behavior of the newly mapped operators.
+
+\subsection*{Quantitative Results}
+The evaluation results across the different obfuscation strategies are detailed in Table \ref{tab:obfuscation_results}.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{l c c c c}
+\toprule
+\textbf{Scheme} & \textbf{Overall Acc.} & \textbf{Level 1 Acc.} & \textbf{Level 2 Acc.} & \textbf{Level 3 Acc.} \\
+\midrule
+Original & 11.3\% & 30.0\% & 2.0\% & 2.0\% \\
+Gibberish & 10.0\% & 28.0\% & 0.0\% & 2.0\% \\
+Unicode & 6.0\% & 16.0\% & 0.0\% & 2.0\% \\
+Semantic & 0.0\% & 0.0\% & 0.0\% & 0.0\% \\
+Misleading & 0.0\% & 0.0\% & 0.0\% & 0.0\% \\
+\bottomrule
+\end{tabular}
+\caption{Accuracy of the Qwen-0.5B-Instruct model under various obfuscation schemes.}
+\label{tab:obfuscation_results}
+\end{table}
+
+\subsection*{Analysis and Discussion}
+
+The results reveal an unexpected failure mode: both the \textbf{Semantic} and \textbf{Misleading} schemes resulted in a catastrophic 0.0\% accuracy. This complete failure was not necessarily due to an inability to perform the underlying mathematics, but rather a \textbf{formatting collapse} triggered by the semantic weight of the prompt.
+
+When presented with purely logical or meaningless symbols (Original, Gibberish, and Unicode), the model treated the prompt as an abstract puzzle and strictly adhered to the required output format (\texttt{Final Answer: <number>}). However, when real English words (\texttt{combine}, \texttt{paint}) were introduced into the mathematical expressions, it triggered the model's pre-trained conversational priors. The model abandoned the strict formatting constraint, outputting conversational sentences such as \texttt{The final answer is 23.} or \texttt{The final answer is 1.3.} Because the extraction script required a strict regex match, these conversational deviations resulted in widespread extraction failures.
+
+This demonstrates that semantic and misleading obfuscation can actively degrade model performance by breaking the formal structure of the prompt, overriding the system instructions with pre-trained conversational habits.
+
+\end{document}
