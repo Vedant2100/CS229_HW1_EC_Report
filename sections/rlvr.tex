@@ -16,8 +16,7 @@ RLVR (GRPO) & 8.0\% & 20.0\% & 2.0\% & 2.0\% \\
 \label{tab:rlvr_results}
 \end{table}
 
-\subsection*{Qualitative Examples}
-Lacking explicit guidance, the model defaulted to its pre-trained arithmetic priors (typically multiplication):
+With no guidance and sparse feedback, the model usually answered from its pre-trained arithmetic priors:
 \begin{itemize}
     \item \textbf{Problem:} \texttt{glorp(flarn(9, 7))} $\rightarrow$ Expected: 16 (Addition) | \textbf{Model Output:} 63
     \item \textbf{Problem:} \texttt{glorp(snib(13, 10))} $\rightarrow$ Expected: 3 (Subtraction) | \textbf{Model Output:} 130
