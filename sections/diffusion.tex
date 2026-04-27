@@ -1,10 +1,7 @@
-\section*{4. Repeating original experiments with LLaDA-8B}
+\section*{3. LLaDA-8B}
 
 \subsection*{Problem \& Approach}
-We compare a traditional autoregressive model to LLaDA, a discrete diffusion language model, to see how non-sequential generation affects mathematical reasoning. We evaluate LLaDA-8B by denoising fully masked sequences of length $N$ across varying diffusion steps $T \in \{8, 16, 32, 64\}$, where the number of tokens unmasked per step follows a linear schedule $k_t \approx \lfloor N/T \rfloor$.
-
-A fair comparison with Qwen won't be possible since Qwen 0.5B was a 500 million  parameter model as compared to 8 billion in LLaDA.
-However, we can compare the performance over different number of denoising steps $T \in \{8, 16, 32, 64\}$ for the model, with no of tokens at each step to be unmasked linearly decreasing with no of steps.
+I didn't find time to do a comparison of the 5 methods with LLaDA. I was only able to perform an analysis of different number of denoising steps $T \in \{8, 16, 32, 64\}$ for the model, with no of tokens at each step to be unmasked linearly decreasing with no of steps.
 
 \begin{table}[h]
 \centering
@@ -32,15 +29,15 @@ $T = 64$ & 77.3\% & 100.0\% & 92.0\%  & 40.0\%  & 0 \\
 % \end{figure}
 
 
-Best performance observed at T = 32 (80\%). Format failures were relatively high at lower steps, likely because at each such step the model would need to unmask large number of tokens, including under-confident ones and stay with them. Therefore, it had less chances to correct its formatting. When I increased T to 64, its errors are not related to formatting but actual reasoning which could be a limitaiton with smaller T too but overshadowed by the formatting error.
+Best performance observed at T = 32 (80\%). Format failures were relatively high at lower steps, likely because at each such step the model would need to unmask large number of tokens, including under-confident ones and stay with them. Therefore, it had less chances to correct its formatting. When I increased T to 64, its errors are not related to formatting but actual reasoning which could be a limitaiton with smaller T too but overshadowed by the formatting error.\\ \\
 
-Example of such T = 8 Failure: \\
+Example of such a T = 8 Failure: \\
 \texttt{Problem: glorp(flarn(9, 7))} \\
 \texttt{Expected: Final Answer: 16} \\
 \texttt{Got: First, calculate flarn(9, 7) which is 9 + 7 = 16} \\
 
 \vspace{0.5em}
-Example of such T = 64 Failure: \\
+Example of such a T = 64 Failure: \\
 \texttt{Problem: glorp(flarn(snib(12, 4), 4))} \\ \texttt{Expected: Final Answer: 12} \\
 \texttt{Got: Final Answer: 8} \\
 
