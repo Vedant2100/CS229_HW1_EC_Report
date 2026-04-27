@@ -30,7 +30,15 @@ $T = 64$ & 78.0\% & 100.0\% & 94.0\%  & 40.0\%  & 0 \\
 
 Best performance observed at T = 32 (80\%). Format failures were relatively high at lower steps, likely because at each such step the model would need to unmask large number of tokens, including under-confident ones and stay with them. Therefore, it had less chances to correct its formatting. When I increased T to 64, its errors are not related to formatting but actual reasoning which get uncovered as an actual limitation.
 
-\subsection*{Examples}
-When $T \ge 32$, errors on complex Level 3 problems are mostly due to poor state-tracking rather than syntax errors. For example: \\
-\texttt{glorp(flarn(snib(12, 4), 4))} $\rightarrow$ Expected: 12 | Got: 8. \\
-The model computes the inner operation ($12-4=8$) but fails to propagate the result through the outer addition.
+\subsection*{Qualitative Examples of Failures}
+
+\textbf{T = 8 Failure (Syntax Collapse):} \\
+\texttt{Problem: glorp(flarn(11, 16))} $\rightarrow$ \texttt{Got: None} \\
+\texttt{Output: First Answer: 27} \\
+\textit{Analysis: The aggressive unmasking schedule forced the model to commit to "First" instead of "Final", breaking the extraction regex.}
+
+\vspace{0.5em}
+\textbf{T = 64 Failure (Reasoning/State-Tracking):} \\
+\texttt{Problem: glorp(flarn(snib(12, 4), 4))} $\rightarrow$ \texttt{Expected: 12 | Got: 8} \\
+\texttt{Output: Final Answer: 8} \\
+\textit{Analysis: The model correctly computes the inner operation ($12-4=8$) but fails to propagate the result through the outer addition, incorrectly terminating the reasoning chain early.}
