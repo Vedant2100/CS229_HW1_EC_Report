@@ -1,9 +1,8 @@
-\section*{4. Original experiments with LLaDA-8B}
+\section*{4. Repeating experiments with LLaDA-8B}
 
-\subsection*{Methodology}
-We evaluated LLaDA-8B using a discrete diffusion process to denoise fully masked sequences of length $N$. We ablated the number of diffusion steps $T \in \{8, 16, 32, 64\}$. The number of tokens unmasked at step $t$ follows a linear schedule: $k_t \approx \lfloor N/T \rfloor$.
+A fair comparison with Qwen won't be possible since Qwen 0.5B was a 500 million  parameter model as compared to 8 billion in LLaDA.
+However, we can compare the performance over different number of denoising steps $T \in \{8, 16, 32, 64\}$ for the model, with no of tokens at each step to be unmasked linearly decreasing with no of steps.
 
-\subsection*{Results \& Analysis}
 \begin{table}[h]
 \centering
 \begin{tabular}{l c c c c c}

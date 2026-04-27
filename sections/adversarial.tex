@@ -1,16 +1,12 @@
-\section*{3. Adversarial Alien Obfuscation}
+\section*{1. Adversarial Alien Obfuscation}
 
-\subsection*{Methodology}
-I evaluated zero-shot robustness by replacing alien operator names with different words following four obfuscation schemes:
+Replacing alien operator names with different words following four obfuscation schemes:
 \begin{itemize}
-    \item \textbf{Semantic}: Idea-related English words (e.g., \texttt{combine}).
+    \item \textbf{Semantic}: Similar idea English words (e.g., \texttt{combine}).
     \item \textbf{Misleading}: Unrelated English words (e.g., \texttt{paint}).
     \item \textbf{Gibberish}: Random strings (e.g., \texttt{qahft}).
     \item \textbf{Unicode}: Non-ASCII symbols (e.g., $\Delta$).
 \end{itemize}
-
-\subsection*{Results \& Analysis}
-Table \ref{tab:obfuscation_results} shows the results.
 
 \begin{table}[h]
 \centering
@@ -29,4 +25,5 @@ Misleading & 0.0\% & 0.0\% & 0.0\% & 0.0\% \\
 \label{tab:obfuscation_results}
 \end{table}
 
-Both \textbf{Semantic} and \textbf{Misleading} schemes completely failed (succeeded?) (0.0\% accuracy) due to a \textbf{formatting collapse}. While meaningless symbols (Original, Gibberish, Unicode) forced the model to treat the prompt as an abstract logic puzzle and output exactly \texttt{Final Answer: <number>}, real English words triggered pre-trained conversational priors. The model output natural sentences (e.g., \texttt{The final answer is 23.}), causing widespread extraction script failures. Thus, English-word obfuscation actively degrades performance by breaking instruction-following behavior.
+In the Semantic and Misleading schemes, the attack worked.
+With meaningless symbols (Original, Gibberish, Unicode), the model could have still treated the prompt as an logic puzzle, solved it and followed the formatting to output exactly \texttt{Final Answer: <number>}, but with real English words it likely triggered conversational priors from training data. The model outputs natural sentences (e.g., \texttt{The final answer is 23.}), which even though correct couldn't be extracted by regex matching and thus marked as failed. 
