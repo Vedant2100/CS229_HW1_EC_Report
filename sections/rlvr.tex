@@ -1,9 +1,7 @@
 \section*{5. Reinforcement Learning with Verifiable Rewards (RLVR)}
 
-\subsection*{Methodology}
-We trained the model on alien arithmetic using Group Relative Policy Optimization (GRPO). Instead of explicit reasoning trajectories (as in LoRA), the model received a sparse binary reward ($1.0$ for an exact integer match, $0.0$ otherwise) without any system definitions of the alien operators.
-
-\subsection*{Results \& Analysis}
+In GRPO, instead of explicit answers as in LoRA, the model received a sparse binary reward ($1.0$ for an exact integer match, $0.0$ otherwise) without any system definitions of the alien operators. It is very inefficient for it to be able to guess the correct answers and then receive a reward/signal, as compared to LoRA where we include the correct answer phrase, over which it continuously updated gradients.
+LoRA kinda provided every prediction token level gradients where as RLVR provided a gradient for many more predicted tokens.
 \begin{table}[h]
 \centering
 \begin{tabular}{l c c c c}
@@ -17,8 +15,6 @@ RLVR (GRPO) & 8.0\% & 20.0\% & 2.0\% & 2.0\% \\
 \caption{Accuracy comparison between LoRA and RLVR.}
 \label{tab:rlvr_results}
 \end{table}
-
-RLVR catastrophically failed compared to supervised LoRA due to the \textbf{sparse reward problem}. LoRA utilizes dense supervision (teacher forcing), providing immediate token-level gradients that quickly map alien operators to pre-trained concepts. GRPO relies entirely on random exploration. Without a system prompt defining the operators, the model had to randomly hallucinate the exact correct multi-digit answer to receive a positive reward. The near-zero probability of this occurring caused the policy gradient to flatline.
 
 \subsection*{Qualitative Examples}
 Lacking explicit guidance, the model defaulted to its pre-trained arithmetic priors (typically multiplication):
