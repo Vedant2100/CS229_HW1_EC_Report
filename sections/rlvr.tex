@@ -1,52 +1,28 @@
-
-\section*{Extra Credit 5: Reinforcement Learning with Verifiable Rewards (RLVR)}
+\section*{5. Reinforcement Learning with Verifiable Rewards (RLVR)}
 
 \subsection*{Methodology}
-In this experiment, we evaluated the use of Group Relative Policy Optimization (GRPO), a reinforcement learning framework, to teach the model alien arithmetic. Unlike Supervised Fine-Tuning (LoRA) where the model is explicitly trained on ground-truth reasoning trajectories, RLVR relies on a verifiable reward signal. The model generated responses to the alien math problems, and we provided a binary reward ($1.0$ for an exact match of the final integer, $0.0$ otherwise) using the \texttt{exact\_match\_reward} function. The model was given a basic prompt without any system definitions of the operators.
+We trained the model on alien arithmetic using Group Relative Policy Optimization (GRPO). Instead of explicit reasoning trajectories (as in LoRA), the model received a sparse binary reward ($1.0$ for an exact integer match, $0.0$ otherwise) without any system definitions of the alien operators.
 
-\subsection*{Quantitative Results}
-
-The empirical results for the GRPO-trained model are detailed in Table \ref{tab:rlvr_results}.
-
+\subsection*{Results \& Analysis}
 \begin{table}[h]
 \centering
 \begin{tabular}{l c c c c}
 \toprule
-\textbf{Method} & \textbf{Overall Acc.} & \textbf{Level 1 Acc.} & \textbf{Level 2 Acc.} & \textbf{Level 3 Acc.} \\
+\textbf{Method} & \textbf{Overall Acc.} & \textbf{Level 1} & \textbf{Level 2} & \textbf{Level 3} \\
 \midrule
-Supervised LoRA & 36.7\% (55/150) & 96.0\% (48/50) & 10.0\% (5/50) & 4.0\% (2/50) \\
-RLVR (GRPO) & 8.0\% (12/150) & 20.0\% (10/50) & 2.0\% (1/50) & 2.0\% (1/50) \\
+Supervised LoRA & 36.7\% & 96.0\% & 10.0\% & 4.0\% \\
+RLVR (GRPO) & 8.0\% & 20.0\% & 2.0\% & 2.0\% \\
 \bottomrule
 \end{tabular}
-\caption{Accuracy comparison between Supervised Fine-Tuning (LoRA) and RLVR (GRPO).}
+\caption{Accuracy comparison between LoRA and RLVR.}
 \label{tab:rlvr_results}
 \end{table}
 
-\begin{figure}[h]
-    \centering
-    % TODO: If you generated a comparison plot, insert it here:
-    % \includegraphics[width=0.6\textwidth]{rlvr_comparison_plot.png}
-    \caption{Performance of RLVR compared to other methods.}
-    \label{fig:rlvr_plot}
-\end{figure}
-
-\subsection*{Analysis and Discussion}
-
-The RLVR approach failed to generalize, achieving only an \textbf{8.0\% overall accuracy}. This represents a severe degradation compared to our prior supervised LoRA approach. This discrepancy highlights the fundamental difference between dense supervision and sparse rewards.
-
-In Supervised Fine-Tuning (LoRA), the model is trained using \textbf{dense supervision} (teacher forcing). It is explicitly provided with the exact correct target string (e.g., \texttt{Final Answer: 16}) and receives immediate token-by-token cross-entropy feedback, directly penalizing it for generating anything else. This direct guidance allows the model to quickly map the alien \texttt{flarn} token to its pre-trained concept of addition.
-
-Conversely, RLVR suffers from the \textbf{sparse reward problem}. Under GRPO, the model generates an entire response without seeing the target. If it is wrong, it receives a $0.0$ reward, which tells it the answer was incorrect but provides no information about what the right answer should have been. Because we did not provide a system prompt defining the alien operators, the model was forced to rely purely on random exploration. To learn that \texttt{flarn(9, 7)} means $9 + 7 = 16$, the model would have to randomly hallucinate the exact number 16. The probability of randomly generating the correct multi-digit integer by pure chance is infinitesimally small. As a result, the model almost never received a positive reward ($1.0$) during the early stages of training, causing the policy gradient to flatline.
+RLVR catastrophically failed compared to supervised LoRA due to the \textbf{sparse reward problem}. LoRA utilizes dense supervision (teacher forcing), providing immediate token-level gradients that quickly map alien operators to pre-trained concepts. GRPO relies entirely on random exploration. Without a system prompt defining the operators, the model had to randomly hallucinate the exact correct multi-digit answer to receive a positive reward. The near-zero probability of this occurring caused the policy gradient to flatline.
 
 \subsection*{Qualitative Examples}
-
-The model's failure modes reveal that instead of learning the alien operators, it fell back on its pre-trained arithmetic priors, commonly defaulting to multiplication:
+Lacking explicit guidance, the model defaulted to its pre-trained arithmetic priors (typically multiplication):
 \begin{itemize}
-    \item \textbf{Problem:} \texttt{glorp(flarn(9, 7))} $\rightarrow$ Expected: 16 (Addition)
-    \item \textbf{Model Output:} \texttt{Final Answer: 63} (Multiplication)
-    
-    \item \textbf{Problem:} \texttt{glorp(snib(13, 10))} $\rightarrow$ Expected: 3 (Subtraction)
-    \item \textbf{Model Output:} \texttt{Final Answer: 130} (Multiplication)
+    \item \textbf{Problem:} \texttt{glorp(flarn(9, 7))} $\rightarrow$ Expected: 16 (Addition) | \textbf{Model Output:} 63
+    \item \textbf{Problem:} \texttt{glorp(snib(13, 10))} $\rightarrow$ Expected: 3 (Subtraction) | \textbf{Model Output:} 130
 \end{itemize}
-
-Because the model lacked the guidance of supervised reasoning trajectories and failed to randomly stumble upon enough positive rewards to infer the rules, GRPO proved entirely ineffective for adapting the model to zero-shot alien syntax in this restricted training window.
