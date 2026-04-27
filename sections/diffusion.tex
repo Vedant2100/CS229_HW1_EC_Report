@@ -1,4 +1,7 @@
-\section*{4. Repeating experiments with LLaDA-8B}
+\section*{4. Repeating original experiments with LLaDA-8B}
+
+\subsection*{Problem \& Approach}
+We compare a traditional autoregressive model to LLaDA, a discrete diffusion language model, to see how non-sequential generation affects mathematical reasoning. We evaluate LLaDA-8B by denoising fully masked sequences of length $N$ across varying diffusion steps $T \in \{8, 16, 32, 64\}$, where the number of tokens unmasked per step follows a linear schedule $k_t \approx \lfloor N/T \rfloor$.
 
 A fair comparison with Qwen won't be possible since Qwen 0.5B was a 500 million  parameter model as compared to 8 billion in LLaDA.
 However, we can compare the performance over different number of denoising steps $T \in \{8, 16, 32, 64\}$ for the model, with no of tokens at each step to be unmasked linearly decreasing with no of steps.
